@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import model.Produto;
+
 public class Banco {
 	private static Connection c = null;
 	private static PreparedStatement ps = null;
@@ -44,6 +46,28 @@ public class Banco {
 		criarTblSaborSecundario();
 		criarTblTelefone();
 		criarTblTelefoneCliente();
+		criarTblTipoProduto();
+		Produto.cadastraTipoProduto("Pizza");
+		Produto.cadastraTipoProduto("Pizza meio meio");
+
+	}
+
+	public static void criarTblTipoProduto() {
+
+		try {
+			String sql = "CREATE TABLE tbl_tipo_produto (ID_Tipo_Produto INTEGER PRIMARY KEY AUTOINCREMENT, "
+					+ "	Tipo_Produto TEXT NOT NULL)";
+
+			c = FabricaDeConexoes.abrirConexao();
+			ps = c.prepareStatement(sql);
+			ps.executeUpdate();
+			c.commit();
+			FabricaDeConexoes.fecharConexao(rs, ps, c);
+
+		} catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+		}
+
 	}
 
 	private static void criarTblTelefoneCliente() {
@@ -161,7 +185,8 @@ public class Banco {
 
 		try {
 			String sql = "CREATE TABLE tbl_produto (ID_Produto INTEGER PRIMARY KEY AUTOINCREMENT, "
-					+ "Nome TEXT NOT NULL UNIQUE, " + "Valor REAL NOT NULL)";
+					+ "ID_Tipo_Produto TEXT NOT NULL, " + "Nome TEXT NOT NULL UNIQUE, " + "Valor REAL NOT NULL, "
+					+ "FOREIGN KEY(ID_Tipo_Produto) REFERENCES tbl_tipo_produto(ID_Tipo_Produto))";
 
 			c = FabricaDeConexoes.abrirConexao();
 			ps = c.prepareStatement(sql);
@@ -218,8 +243,7 @@ public class Banco {
 
 		try {
 			String sql = "CREATE TABLE tbl_pizza_meio_meio (ID_Pizza_Meio_Meio INTEGER PRIMARY KEY AUTOINCREMENT, "
-					+ "Nome TEXT NOT NULL UNIQUE, " 
-					+ "ID_Sabor_Primario INTEGER NOT NULL, "
+					+ "Nome TEXT NOT NULL UNIQUE, " + "ID_Sabor_Primario INTEGER NOT NULL, "
 					+ "ID_Sabor_Secundario INTEGER NOT NULL, "
 					+ "FOREIGN KEY(ID_Sabor_Secundario) REFERENCES tbl_sabor_secundario(ID_Sabor_Secundario), "
 					+ "FOREIGN KEY(ID_Sabor_Primario) REFERENCES tbl_sabor_primario(ID_Sabor_Primario))";
